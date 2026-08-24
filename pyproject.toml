@@ -5,7 +5,7 @@ description = "Risk/Churn Scoring Platform with Seldon Core - ML deployment with
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [
-    {name = "Your Team", email = "team@example.com"}
+    {name = "Jojo Anand"}
 ]
 keywords = ["machine-learning", "mlops", "seldon", "risk-scoring", "churn-prediction"]
 classifiers = [
