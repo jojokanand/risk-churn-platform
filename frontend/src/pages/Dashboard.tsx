@@ -191,7 +191,11 @@ const Dashboard: React.FC = () => {
             <div className="metric-value">
               {metrics?.total_requests.toLocaleString() || '0'}
             </div>
-            <div className="metric-change positive">↑ 12.5% vs last hour</div>
+            <div className="metric-change neutral">
+              {(metrics?.total_requests ?? 0) > 0
+                ? 'Requests processed since startup'
+                : 'No requests recorded yet'}
+            </div>
           </div>
 
           <div className="metric-card">
@@ -205,15 +209,19 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="metric-card">
-            <div className="metric-label">Avg Prediction Latency</div>
-            <div className="metric-value">12.4ms</div>
-            <div className="metric-change positive">↓ 2.1ms vs baseline</div>
+            <div className="metric-label">Model v1 Requests</div>
+            <div className="metric-value">
+              {(metrics?.v1_requests ?? 0).toLocaleString()}
+            </div>
+            <div className="metric-change neutral">Primary-model traffic</div>
           </div>
 
           <div className="metric-card">
-            <div className="metric-label">Model Accuracy</div>
-            <div className="metric-value">91.2%</div>
-            <div className="metric-change positive">↑ 0.8% this week</div>
+            <div className="metric-label">Model v2 Requests</div>
+            <div className="metric-value">
+              {(metrics?.v2_requests ?? 0).toLocaleString()}
+            </div>
+            <div className="metric-change neutral">Candidate-model traffic</div>
           </div>
         </div>
       </div>
