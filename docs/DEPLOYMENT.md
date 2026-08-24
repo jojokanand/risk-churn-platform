@@ -649,4 +649,4 @@ After successful deployment:
 5. [OK] Set up alerts for your team
 6. [OK] Plan retention campaigns based on insights
 
-Happy deploying! 
+Happy deploying!

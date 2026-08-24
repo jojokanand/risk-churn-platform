@@ -1,57 +1,56 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        args: [--allow-multiple-documents]
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: [--maxkb=1000]
       - id: check-json
       - id: check-toml
       - id: check-merge-conflict
       - id: check-case-conflict
       - id: detect-private-key
 
-  - repo: https://github.com/psf/black
-    rev: 24.1.1
-    hooks:
-      - id: black
-        language_version: python3.11
-
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        name: isort (python)
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.14
-    hooks:
-      - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
-    hooks:
-      - id: mypy
-        additional_dependencies:
-          - types-PyYAML
-          - types-requests
-        args: [--ignore-missing-imports, --warn-unused-ignores]
-
-  - repo: https://github.com/python-poetry/poetry
-    rev: '1.7.0'
-    hooks:
-      - id: poetry-check
-
   - repo: local
     hooks:
+      - id: black
+        name: black
+        entry: uv run --frozen --extra dev black
+        language: system
+        types: [python]
+        files: ^(src|tests)/
+
+      - id: isort
+        name: isort
+        entry: uv run --frozen --extra dev isort
+        language: system
+        types: [python]
+        files: ^(src|tests)/
+
+      - id: ruff
+        name: ruff
+        entry: uv run --frozen --extra dev ruff check
+        language: system
+        types: [python]
+        files: ^(src|tests)/
+        args: [--fix, --exit-non-zero-on-fix]
+
+      - id: mypy
+        name: mypy
+        entry: uv run --frozen --extra dev mypy
+        language: system
+        files: ^src/
+        pass_filenames: false
+        args: [src/]
+
       - id: pytest-check
-        name: pytest-check
-        entry: pytest
+        name: unit tests
+        entry: uv run --frozen --extra dev pytest
         language: system
         pass_filenames: false
         always_run: true
-        args: [tests/, -v, --tb=short]
+        args: [tests/unit/, -q]
         stages: [pre-push]

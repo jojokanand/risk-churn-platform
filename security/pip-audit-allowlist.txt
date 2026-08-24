@@ -1,0 +1,38 @@
+# Temporary vulnerability exceptions for transitive dependencies.
+#
+# Each advisory is listed explicitly so newly reported vulnerabilities still
+# fail CI. Remove entries when compatible upstream releases become available.
+
+# Pillow is constrained to <11 by alibi 0.9.6.
+# Available security fixes require Pillow >=12.1.1.
+PYSEC-2026-165
+PYSEC-2026-2249
+PYSEC-2026-2250
+PYSEC-2026-2252
+PYSEC-2026-2253
+PYSEC-2026-2254
+PYSEC-2026-2255
+PYSEC-2026-2256
+PYSEC-2026-2257
+PYSEC-2026-2874
+PYSEC-2026-3451
+PYSEC-2026-3453
+PYSEC-2026-3454
+PYSEC-2026-3493
+PYSEC-2026-3494
+PYSEC-2026-3495
+PYSEC-2026-3496
+
+# Starlette is constrained by FastAPI 0.128.0.
+# Available fixes require Starlette >=1.0.1.
+PYSEC-2026-161
+PYSEC-2026-248
+PYSEC-2026-249
+PYSEC-2026-2280
+PYSEC-2026-2281
+
+# Transformers is constrained to <5 by alibi and alibi-detect.
+PYSEC-2025-217
+PYSEC-2026-2288
+PYSEC-2026-2289
+PYSEC-2026-2290
