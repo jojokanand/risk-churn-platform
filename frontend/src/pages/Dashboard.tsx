@@ -134,6 +134,13 @@ const Dashboard: React.FC = () => {
     );
   }
 
+  const agreementRate =
+  shadowAnalysis &&
+  Number.isFinite(shadowAnalysis.agreement_rate) &&
+  (shadowAnalysis.total_comparisons ?? 0) > 0
+    ? `${(shadowAnalysis.agreement_rate * 100).toFixed(1)}%`
+    : 'N/A';
+
   return (
     <div className="dashboard-page">
       {/* System Status */}
@@ -190,9 +197,7 @@ const Dashboard: React.FC = () => {
           <div className="metric-card">
             <div className="metric-label">Model Agreement Rate</div>
             <div className="metric-value">
-              {shadowAnalysis
-                ? `${(shadowAnalysis.agreement_rate * 100).toFixed(1)}%`
-                : 'N/A'}
+              {agreementRate}
             </div>
             <div className="metric-change neutral">
               {shadowAnalysis?.total_comparisons || 0} comparisons
