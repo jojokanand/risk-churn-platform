@@ -22,7 +22,7 @@ This documentation covers:
 
 ## Platform Overview
 
-The Risk/Churn Scoring Platform is a production-ready ML platform featuring:
+The Risk/Churn Scoring Platform is a production-style MLOps reference implementation featuring:
 
 - **Interactive Web Dashboard** for monitoring and management
 - **Multi-Model Deployment** with A/B testing strategies
@@ -37,6 +37,5 @@ The Risk/Churn Scoring Platform is a production-ready ML platform featuring:
 
 ---
 
-**Platform Status**: ✅ Production-Ready
+**Platform Status**: Reference Implementation
 **Latest Version**: 0.1.0
-**Last Updated**: January 2026
