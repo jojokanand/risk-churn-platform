@@ -128,7 +128,7 @@ pre-commit install
 
 4. **Start full platform with Docker Compose**:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 This starts:
