@@ -96,31 +96,31 @@ curl -X POST http://localhost:8000/predict \
 
 ```bash
 # Start everything
-docker-compose up -d
+docker compose up -d
 
 # Stop everything
-docker-compose down
+docker compose down
 
 # Restart a service
-docker-compose restart api
+docker compose restart api
 ```
 
 ### View Logs
 
 ```bash
 # All services
-docker-compose logs -f
+docker compose logs -f
 
 # Specific service
-docker-compose logs -f frontend
-docker-compose logs -f api
+docker compose logs -f frontend
+docker compose logs -f api
 ```
 
 ### Check Status
 
 ```bash
 # Service status
-docker-compose ps
+docker compose ps
 
 # Resource usage
 docker stats
@@ -136,7 +136,7 @@ sudo lsof -i :80
 # Kill the process
 sudo kill -9 <PID>
 
-# Or use different port in docker-compose.yml
+# Or use different port in docker compose.yml
 ports:
   - "8080:80"  # Access at http://localhost:8080
 ```
@@ -153,11 +153,11 @@ docker info
 ### Issue: Services not starting
 ```bash
 # View logs for errors
-docker-compose logs
+docker compose logs
 
 # Rebuild everything
-docker-compose down
-docker-compose up -d --build
+docker compose down
+docker compose up -d --build
 ```
 
 ## What's Next?
@@ -189,7 +189,7 @@ docker-compose up -d --build
 ## Get Help
 
 -  Documentation: See `DASHBOARD_GUIDE.md`
--  Issues: Check logs with `docker-compose logs -f`
+-  Issues: Check logs with `docker compose logs -f`
 -  Tips: All guides in repository root
 -  Troubleshooting: See `DEPLOYMENT.md`
 
