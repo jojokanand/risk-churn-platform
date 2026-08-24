@@ -102,3 +102,5 @@ Thumbs.db
 data/ecommerce/*.csv
 data/ecommerce/processed_*.csv
 ecommerce-dataset.zip
+
+node_modules/

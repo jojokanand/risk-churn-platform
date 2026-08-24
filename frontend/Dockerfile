@@ -1,35 +1,30 @@
-# Multi-stage build for React frontend
+# Multi-stage build for the Vite React frontend
 
-# Stage 1: Build the React app
-FROM node:18-alpine AS build
+# Stage 1: Build the frontend
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm ci --legacy-peer-deps
+# Install locked dependencies
+RUN npm ci
 
 # Copy source code
 COPY . .
 
-# Build the app
+# Build the frontend
 RUN npm run build
 
 # Stage 2: Serve with nginx
 FROM nginx:alpine
 
-# Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy built app from build stage
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port
 EXPOSE 80
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
 
