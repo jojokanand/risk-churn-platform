@@ -8,7 +8,7 @@ Complete guide to deploying the Risk Churn Platform with the web dashboard.
 
 [OK] **Required:**
 - Docker Desktop installed and running
-- docker-compose installed
+- docker compose installed
 - 8GB+ RAM available
 - Ports 80, 3000, 8000, 9090, 9092, 6379 available
 
@@ -43,12 +43,12 @@ cd risk-churn-platform
 
 2. **Start all services:**
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 3. **Verify services are running:**
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 Expected output:
@@ -80,7 +80,7 @@ source .venv/bin/activate
 uv pip install -e ".[dev]"
 
 # Start infrastructure
-docker-compose up -d kafka redis prometheus
+docker compose up -d kafka redis prometheus
 
 # Start API
 uvicorn src.risk_churn_platform.api.rest_api:app --reload
@@ -219,19 +219,19 @@ curl -X POST http://localhost:8000/predict \
 
 **All services:**
 ```bash
-docker-compose logs -f
+docker compose logs -f
 ```
 
 **Specific service:**
 ```bash
-docker-compose logs -f frontend
-docker-compose logs -f api
-docker-compose logs -f kafka
+docker compose logs -f frontend
+docker compose logs -f api
+docker compose logs -f kafka
 ```
 
 **Last 100 lines:**
 ```bash
-docker-compose logs --tail=100 api
+docker compose logs --tail=100 api
 ```
 
 ### Check Resource Usage
@@ -268,7 +268,7 @@ sudo lsof -i :80
 # Kill the process or stop the service
 sudo kill -9 <PID>
 
-# Or change the port in docker-compose.yml
+# Or change the port in docker compose.yml
 ```
 
 ### Issue: Frontend Not Loading
@@ -278,22 +278,22 @@ sudo kill -9 <PID>
 **Solutions:**
 1. Check frontend container is running:
    ```bash
-   docker-compose ps frontend
+   docker compose ps frontend
    ```
 
 2. Check frontend logs:
    ```bash
-   docker-compose logs frontend
+   docker compose logs frontend
    ```
 
 3. Rebuild frontend:
    ```bash
-   docker-compose up -d --build frontend
+   docker compose up -d --build frontend
    ```
 
 4. Check nginx config:
    ```bash
-   docker-compose exec frontend cat /etc/nginx/conf.d/default.conf
+   docker compose exec frontend cat /etc/nginx/conf.d/default.conf
    ```
 
 ### Issue: API Not Responding
@@ -308,17 +308,17 @@ sudo kill -9 <PID>
 
 2. Check API logs:
    ```bash
-   docker-compose logs api
+   docker compose logs api
    ```
 
 3. Restart API:
    ```bash
-   docker-compose restart api
+   docker compose restart api
    ```
 
 4. Check if models are loaded:
    ```bash
-   docker-compose exec api ls -la /app/models
+   docker compose exec api ls -la /app/models
    ```
 
 ### Issue: Kafka Connection Errors
@@ -328,22 +328,22 @@ sudo kill -9 <PID>
 **Solutions:**
 1. Ensure Kafka is running:
    ```bash
-   docker-compose ps kafka zookeeper
+   docker compose ps kafka zookeeper
    ```
 
 2. Check Kafka logs:
    ```bash
-   docker-compose logs kafka
+   docker compose logs kafka
    ```
 
 3. Restart Kafka:
    ```bash
-   docker-compose restart kafka zookeeper
+   docker compose restart kafka zookeeper
    ```
 
 4. Verify Kafka topics:
    ```bash
-   docker-compose exec kafka kafka-topics --list --bootstrap-server localhost:9092
+   docker compose exec kafka kafka-topics --list --bootstrap-server localhost:9092
    ```
 
 ### Issue: Out of Memory
@@ -371,14 +371,14 @@ sudo kill -9 <PID>
 
 **API Service:**
 ```bash
-docker-compose up -d --scale api=3
+docker compose up -d --scale api=3
 ```
 
 **Add load balancer** (nginx or traefik) to distribute traffic.
 
 ### Vertical Scaling
 
-Update `docker-compose.yml`:
+Update `docker compose.yml`:
 ```yaml
 api:
   deploy:
@@ -452,7 +452,7 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh user@server 'cd /app && docker-compose pull && docker-compose up -d'
+          ssh user@server 'cd /app && docker compose pull && docker compose up -d'
 ```
 
 ### Database Persistence
@@ -491,17 +491,17 @@ aws s3 cp models/ s3://your-bucket/models/ --recursive
 
 ```bash
 # PostgreSQL
-docker-compose exec postgres pg_dump -U admin risk_churn > backup.sql
+docker compose exec postgres pg_dump -U admin risk_churn > backup.sql
 
 # Restore
-docker-compose exec -T postgres psql -U admin risk_churn < backup.sql
+docker compose exec -T postgres psql -U admin risk_churn < backup.sql
 ```
 
 ### Disaster Recovery
 
 1. **Stop services:**
    ```bash
-   docker-compose down
+   docker compose down
    ```
 
 2. **Restore volumes:**
@@ -512,7 +512,7 @@ docker-compose exec -T postgres psql -U admin risk_churn < backup.sql
 
 3. **Restart:**
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 ## Performance Tuning
@@ -573,7 +573,7 @@ uvicorn src.risk_churn_platform.api.rest_api:app \
 git pull origin main
 
 # Rebuild and restart
-docker-compose up -d --build
+docker compose up -d --build
 
 # Verify health
 curl http://localhost:8000/health
@@ -610,7 +610,7 @@ For non-critical workloads, use EC2 spot instances to save 70-90% on costs.
 ### Get Help
 
 - Documentation: `README.md`, `DASHBOARD_GUIDE.md`
-- Logs: `docker-compose logs -f`
+- Logs: `docker compose logs -f`
 - Health Check: `curl http://localhost:8000/health`
 - GitHub Issues: Report bugs and request features
 
@@ -618,20 +618,20 @@ For non-critical workloads, use EC2 spot instances to save 70-90% on costs.
 
 ```bash
 # Restart everything
-docker-compose restart
+docker compose restart
 
 # Rebuild specific service
-docker-compose up -d --build api
+docker compose up -d --build api
 
 # View resource usage
 docker stats
 
 # Clean up
-docker-compose down -v  # Warning: removes volumes
+docker compose down -v  # Warning: removes volumes
 docker system prune -a  # Free up disk space
 
 # Export logs
-docker-compose logs > logs.txt
+docker compose logs > logs.txt
 
 # Check port usage
 lsof -i :80
