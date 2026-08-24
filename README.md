@@ -109,7 +109,7 @@ graph TD
 
 1. **Clone and setup**:
 ```bash
-git clone https://github.com/jyothsnakanand/risk-churn-platform.git
+git clone https://github.com/jojokanand/risk-churn-platform.git
 cd risk-churn-platform
 ```
 
