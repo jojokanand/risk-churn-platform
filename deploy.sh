@@ -19,19 +19,20 @@ fi
 echo "[OK] Docker is running"
 echo ""
 
-# Check if docker-compose is available
-if ! command -v docker-compose &> /dev/null; then
-    echo "[ERROR] docker-compose is not installed"
-    echo "   Please install docker-compose and try again"
+# Check if Docker Compose is available
+if ! docker compose version > /dev/null 2>&1; then
+    echo "[ERROR] Docker Compose is not available"
+    echo "   Install or update Docker Desktop and try again"
     exit 1
 fi
 
-echo "[OK] docker-compose is available"
+echo "[OK] Docker Compose is available"
+
 echo ""
 
 # Stop existing containers
 echo "Stopping existing containers..."
-docker-compose down
+docker compose down
 
 # Build and start all services
 echo ""
@@ -39,7 +40,7 @@ echo "Building and starting services..."
 echo "   This may take a few minutes on first run..."
 echo ""
 
-docker-compose up -d --build
+docker compose up -d --build
 
 # Wait for services to be healthy
 echo ""
@@ -50,7 +51,7 @@ sleep 10
 echo ""
 echo "Service Status:"
 echo "==================="
-docker-compose ps
+docker compose ps
 
 # Display access URLs
 echo ""
@@ -65,11 +66,11 @@ echo "   * Prometheus:         http://localhost:9090"
 echo "   * Grafana:            http://localhost:3000 (admin/admin)"
 echo ""
 echo "Quick Commands:"
-echo "   * View logs:        docker-compose logs -f"
-echo "   * View API logs:    docker-compose logs -f api"
-echo "   * View frontend:    docker-compose logs -f frontend"
-echo "   * Stop services:    docker-compose down"
-echo "   * Restart:          docker-compose restart"
+echo "   * View logs:        docker compose logs -f"
+echo "   * View API logs:    docker compose logs -f api"
+echo "   * View frontend:    docker compose logs -f frontend"
+echo "   * Stop services:    docker compose down"
+echo "   * Restart:          docker compose restart"
 echo ""
 echo "Next Steps:"
 echo "   1. Open http://localhost in your browser"
