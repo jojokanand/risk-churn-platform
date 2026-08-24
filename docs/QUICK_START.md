@@ -200,6 +200,6 @@ You now have a fully functional ML platform with:
 - [OK] Real-time monitoring
 - [OK] Model management
 - [OK] Analytics & insights
-- [OK] Production-ready deployment
+- [OK] Docker-based local deployment workflow
 
 Happy predicting!
