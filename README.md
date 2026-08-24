@@ -112,12 +112,11 @@ cd risk-churn-platform
 
 2. **Install dependencies**:
 ```bash
-# Create virtual environment
-uv venv
-source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
+# Install the locked project and development dependencies
+uv sync --locked --extra dev
 
-# Install dependencies
-uv pip install -e ".[dev]"
+# Activate the environment
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 ```
 
 3. **Install pre-commit hooks**:
