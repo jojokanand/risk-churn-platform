@@ -84,6 +84,11 @@ const Analytics: React.FC = () => {
 
   return (
     <div className="analytics-page">
+      <div className="analytics-notice">
+        <strong>Simulated analytics dataset.</strong> These insights and charts
+        demonstrate the reporting workflow using seeded customer and prediction
+        data. Time-range controls illustrate the available analysis views.
+      </div>
       {/* Time Range Selector */}
       <div className="time-range-selector">
         <button
@@ -111,7 +116,7 @@ const Analytics: React.FC = () => {
         <h3 className="section-title">Key Insights</h3>
         <div className="insights-grid">
           <div className="insight-card">
-            <div className="insight-icon">[WARN]️</div>
+            <div className="insight-icon" aria-hidden="true">!</div>
             <div className="insight-content">
               <h4 className="insight-title">High Risk Customers</h4>
               <p className="insight-value">10%</p>
@@ -122,7 +127,7 @@ const Analytics: React.FC = () => {
           </div>
 
           <div className="insight-card">
-            <div className="insight-icon">[GROWTH]</div>
+            <div className="insight-icon" aria-hidden="true">↘</div>
             <div className="insight-content">
               <h4 className="insight-title">Engagement Decline</h4>
               <p className="insight-value">↓ 15%</p>
@@ -133,7 +138,7 @@ const Analytics: React.FC = () => {
           </div>
 
           <div className="insight-card">
-            <div className="insight-icon">[TARGET]</div>
+            <div className="insight-icon" aria-hidden="true">◎</div>
             <div className="insight-content">
               <h4 className="insight-title">Top Retention Factor</h4>
               <p className="insight-value">Order Recency</p>
@@ -144,7 +149,7 @@ const Analytics: React.FC = () => {
           </div>
 
           <div className="insight-card">
-            <div className="insight-icon">[REVENUE]</div>
+            <div className="insight-icon" aria-hidden="true">$</div>
             <div className="insight-content">
               <h4 className="insight-title">Revenue at Risk</h4>
               <p className="insight-value">$127K</p>

@@ -79,12 +79,15 @@ const ModelManagement: React.FC = () => {
     );
   }
 
-  const v1Percentage = metrics
+  const v1Percentage =
+  metrics && metrics.total_requests > 0
     ? ((metrics.v1_requests / metrics.total_requests) * 100).toFixed(1)
-    : '0';
-  const v2Percentage = metrics
-    ? ((metrics.v2_requests / metrics.total_requests) * 100).toFixed(1)
-    : '0';
+    : '0.0';
+
+  const v2Percentage =
+    metrics && metrics.total_requests > 0
+      ? ((metrics.v2_requests / metrics.total_requests) * 100).toFixed(1)
+      : '0.0';
 
   return (
     <div className="model-management-page">
@@ -96,6 +99,11 @@ const ModelManagement: React.FC = () => {
           </button>
         </div>
       )}
+      <div className="demo-notice">
+        <strong>Local deployment demonstration.</strong> Request counts, routing
+        strategy, and deployment actions are live for this session. Model metadata
+        and deployment history are seeded reference data.
+      </div>
 
       {/* Current Strategy */}
       <div className="card">
@@ -281,7 +289,7 @@ const ModelManagement: React.FC = () => {
         <h3 className="card-title">Deployment Actions</h3>
         <div className="actions-grid">
           <div className="action-card">
-            <div className="action-icon">[DEPLOY]</div>
+            <div className="action-icon" aria-hidden="true">↑</div>
             <h4 className="action-title">Promote v2 to Production</h4>
             <p className="action-description">
               Switch production traffic to model v2. Current v1 will become the backup.
@@ -296,7 +304,7 @@ const ModelManagement: React.FC = () => {
           </div>
 
           <div className="action-card">
-            <div className="action-icon">↩️</div>
+            <div className="action-icon" aria-hidden="true">↶</div>
             <h4 className="action-title">Rollback to v1</h4>
             <p className="action-description">
               Revert production traffic to model v1. Use this if issues are detected with v2.
