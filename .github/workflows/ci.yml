@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
@@ -6,14 +6,21 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PYTHON_VERSION: "3.11"
-  UV_VERSION: "latest"
 
 jobs:
   lint:
-    name: Lint Code
+    name: Lint and Type Check
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v7
 
@@ -23,37 +30,32 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.12.5"
 
       - name: Install dependencies
         run: uv sync --locked --extra dev
 
-      - name: Run Ruff (linter)
-        run: |
-          source .venv/bin/activate
-          ruff check src/ tests/
+      - name: Run Ruff
+        run: uv run ruff check src/ tests/
 
-      - name: Run Black (formatter)
-        run: |
-          source .venv/bin/activate
-          black --check src/ tests/
+      - name: Check formatting with Black
+        run: uv run black --check src/ tests/
 
-      - name: Run isort (import sorter)
-        run: |
-          source .venv/bin/activate
-          isort --check-only src/ tests/
+      - name: Check import ordering
+        run: uv run isort --check-only src/ tests/
 
-      - name: Run mypy (type checker)
-        run: |
-          source .venv/bin/activate
-          mypy src/
+      - name: Run mypy
+        run: uv run mypy src/
 
   test:
-    name: Run Tests
+    name: Unit Tests
     runs-on: ubuntu-latest
+
     services:
       redis:
-        image: redis:7-alpine
+        image: redis:7.2-alpine
         ports:
           - 6379:6379
         options: >-
@@ -71,15 +73,19 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.12.5"
 
       - name: Install dependencies
         run: uv sync --locked --extra dev
 
       - name: Run unit tests
-        run: |
-          source .venv/bin/activate
-          pytest tests/unit/ -v --cov=src --cov-report=xml --cov-report=term-missing
+        run: >
+          uv run pytest tests/unit/ -v
+          --cov=src
+          --cov-report=xml
+          --cov-report=term-missing
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v7
@@ -89,9 +95,7 @@ jobs:
           name: codecov-umbrella
 
       - name: Generate coverage report
-        run: |
-          source .venv/bin/activate
-          coverage html
+        run: uv run coverage html
 
       - name: Upload coverage HTML
         uses: actions/upload-artifact@v7
@@ -102,9 +106,19 @@ jobs:
   integration-test:
     name: Integration Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     services:
+      zookeeper:
+        image: confluentinc/cp-zookeeper:7.5.0
+        ports:
+          - 2181:2181
+        env:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_TICK_TIME: 2000
+
       kafka:
-        image: confluentinc/cp-kafka:latest
+        image: confluentinc/cp-kafka:7.5.0
         ports:
           - 9092:9092
         env:
@@ -113,14 +127,6 @@ jobs:
           KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
           KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-      zookeeper:
-        image: confluentinc/cp-zookeeper:latest
-        ports:
-          - 2181:2181
-        env:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
-
     steps:
       - uses: actions/checkout@v7
 
@@ -130,26 +136,79 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.12.5"
 
       - name: Install dependencies
         run: uv sync --locked --extra dev
 
-      - name: Wait for Kafka
+      - name: Wait for Kafka metadata
         run: |
-          echo "Waiting for Kafka to be ready..."
-          sleep 30
+          uv run python - <<'PY'
+          import time
+
+          from kafka.admin import KafkaAdminClient
+
+          last_error = None
+
+          for attempt in range(1, 31):
+              try:
+                  admin = KafkaAdminClient(
+                      bootstrap_servers="localhost:9092",
+                      request_timeout_ms=5000,
+                      bootstrap_timeout_ms=5000,
+                  )
+                  topics = admin.list_topics()
+                  admin.close()
+                  print(f"Kafka is ready with {len(topics)} topics")
+                  break
+              except Exception as exc:
+                  last_error = exc
+                  print(f"Kafka readiness attempt {attempt}/30 failed: {exc}")
+                  time.sleep(2)
+          else:
+              raise SystemExit(f"Kafka did not become ready: {last_error}")
+          PY
 
       - name: Run integration tests
-        run: |
-          source .venv/bin/activate
-          pytest tests/integration/ -v -m integration
+        run: uv run pytest tests/integration/ -v -m integration
         env:
           KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+
+  frontend:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=moderate
+
+      - name: Build production frontend
+        run: npm run build
+        env:
+          CI: "true"
 
   security:
     name: Security Scan
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v7
 
@@ -159,173 +218,40 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.12.5"
 
       - name: Install dependencies
         run: uv sync --locked --extra dev
 
-      - name: Run Bandit (security linter)
-        run: |
-          source .venv/bin/activate
-          pip install bandit
-          bandit -r src/ -ll
+      - name: Run Bandit
+        run: uv run bandit -r src/ -ll
 
-      - name: Run Safety (dependency scanner)
+      - name: Audit Python dependencies
         run: |
-          source .venv/bin/activate
-          pip install safety
-          safety check --json || true
+          audit_args=()
 
-  build:
-    name: Build Docker Image
+          while IFS= read -r vulnerability_id; do
+            case "$vulnerability_id" in
+              ""|\#*) continue ;;
+            esac
+
+            audit_args+=(--ignore-vuln "$vulnerability_id")
+          done < security/pip-audit-allowlist.txt
+
+          uv run pip-audit --local "${audit_args[@]}"
+
+  container-build:
+    name: Validate Container Builds
     runs-on: ubuntu-latest
-    needs: [lint, test]
-    if: false  # Disabled - configure DOCKER_USERNAME and DOCKER_PASSWORD secrets to enable
+    needs: [lint, test, frontend]
+
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Validate Docker Compose configuration
+        run: docker compose config --quiet
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ secrets.DOCKER_USERNAME }}/risk-churn-platform
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-            type=semver,pattern={{version}}
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  deploy-staging:
-    name: Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: [build]
-    if: false  # Disabled - configure KUBE_CONFIG_STAGING secret to enable
-    environment:
-      name: staging
-      url: https://staging.ml-platform.example.com
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Configure kubectl
-        uses: azure/k8s-set-context@v3
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
-
-      - name: Deploy to staging
-        run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/kafka-deployment.yaml -n ml-platform
-          kubectl apply -f k8s/monitoring-deployment.yaml -n ml-platform
-          kubectl apply -f k8s/seldon-deployment-shadow.yaml -n ml-platform
-
-      - name: Wait for deployment
-        run: |
-          kubectl rollout status deployment/ml-platform-api -n ml-platform --timeout=5m
-
-      - name: Run smoke tests
-        run: |
-          STAGING_URL="https://staging.ml-platform.example.com"
-          response=$(curl -s -o /dev/null -w "%{http_code}" $STAGING_URL/health)
-          if [ $response -ne 200 ]; then
-            echo "Health check failed with status $response"
-            exit 1
-          fi
-
-  deploy-production:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [deploy-staging]
-    if: false  # Disabled - configure KUBE_CONFIG_PRODUCTION secret to enable
-    environment:
-      name: production
-      url: https://api.ml-platform.example.com
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Configure kubectl
-        uses: azure/k8s-set-context@v3
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
-
-      - name: Deploy to production (shadow mode)
-        run: |
-          kubectl apply -f k8s/seldon-deployment-shadow.yaml -n ml-platform
-
-      - name: Wait for deployment
-        run: |
-          kubectl rollout status deployment/ml-platform-api -n ml-platform --timeout=5m
-
-      - name: Monitor deployment
-        run: |
-          # Monitor for 5 minutes
-          for i in {1..30}; do
-            ERROR_RATE=$(kubectl logs -n ml-platform deployment/ml-platform-api --tail=100 | grep ERROR | wc -l)
-            if [ $ERROR_RATE -gt 10 ]; then
-              echo "High error rate detected: $ERROR_RATE errors"
-              kubectl rollout undo deployment/ml-platform-api -n ml-platform
-              exit 1
-            fi
-            sleep 10
-          done
-
-      - name: Send notification
-        if: false  # Disabled - configure SLACK_WEBHOOK secret to enable
-        uses: slackapi/slack-github-action@v1
-        with:
-          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
-          payload: |
-            {
-              "text": "✅ ML Platform deployed to production",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Deployment Successful*\n:white_check_mark: ML Platform v${{ github.sha }} deployed to production"
-                  }
-                }
-              ]
-            }
-
-  notify-failure:
-    name: Notify on Failure
-    runs-on: ubuntu-latest
-    needs: [lint, test, integration-test, security]
-    if: false  # Disabled - configure SLACK_WEBHOOK secret to enable
-    steps:
-      - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1
-        with:
-          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
-          payload: |
-            {
-              "text": "❌ CI/CD Pipeline Failed",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Pipeline Failed*\n:x: Check GitHub Actions for details\nBranch: ${{ github.ref }}\nCommit: ${{ github.sha }}"
-                  }
-                }
-              ]
-            }
+      - name: Build application images
+        run: docker compose build api frontend
