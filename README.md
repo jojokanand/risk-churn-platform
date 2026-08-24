@@ -372,7 +372,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Support
 
-For issues and questions:
-- GitHub Issues: [link]
-- Documentation: [link]
-- Slack: [link]
+For questions, bug reports, or feature requests, open a [GitHub issue](https://github.com/jojokanand/risk-churn-platform/issues). Additional guides are available in the [`docs/`](docs/) directory.
