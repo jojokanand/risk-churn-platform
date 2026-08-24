@@ -1,8 +1,8 @@
-# Building a Production-Ready ML Platform: My Journey from Concept to Dashboard
+# Building a Production-Style MLOps Platform: From Concept to Dashboard
 
 **A capstone project exploring the full lifecycle of machine learning systems**
 
-*By Jyothsna Anand*
+*By Jojo Anand*
 
 ---
 
@@ -196,7 +196,7 @@ The biggest lesson was about incrementality. I didn't build all 113 tests on day
 
 ## The Final Scorecard
 
-After months of work, I built a production-ready ML platform with 27 frontend files, 28 backend modules, 113 passing tests, and 80% code coverage. It has three deployment strategies (shadow, canary, blue-green), real-time drift detection, model explainability with SHAP, automated retraining pipelines, and an interactive dashboard that non-technical users actually enjoy using. The Docker setup deploys locally in minutes and the Kubernetes configs scale to production workloads. It's documented, tested, monitored, and ready to handle real traffic.
+This project explores how a churn-scoring model can move beyond a notebook into a testable MLOps system. It combines a FastAPI inference API, model-routing strategies, drift and outlier monitoring, Kafka-based feedback flows, automated retraining components, and an interactive dashboard. The repository also includes Docker Compose and Kubernetes/Seldon Core deployment configurations as reference implementations; it does not currently operate a public production environment.
 
 ## Try It Yourself
 
@@ -275,6 +275,6 @@ I'd love to hear your thoughts, questions, or suggestions!
 
 ---
 
-*This blog post documents my journey building a production-ready ML platform as a capstone project. All code, tests, and documentation are included in the repository.*
+This post documents the design and implementation of a production-style MLOps capstone. The repository contains the source code, automated tests, deployment manifests, and supporting documentation.
 
 **Tags**: #MachineLearning #MLOps #DataScience #Python #React #Docker #CapstoneProject #ProductionML #ChurnPrediction #Dashboard
