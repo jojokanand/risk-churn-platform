@@ -4,11 +4,10 @@ Kafka Producer Service for Synthetic Data
 Sends generated customer data to Kafka topics for real-time processing.
 """
 
-import json
 import logging
 import time
 
-from kafka import KafkaProducer
+from kafka import DefaultSerializer, JsonSerializer, KafkaProducer
 from kafka.errors import KafkaError
 
 from .synthetic_data_generator import SyntheticDataGenerator
@@ -40,8 +39,8 @@ class KafkaProducerService:
         # Initialize Kafka producer
         self.producer = KafkaProducer(
             bootstrap_servers=bootstrap_servers,
-            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-            key_serializer=lambda k: k.encode("utf-8") if k else None,
+            value_serializer=JsonSerializer(),
+            key_serializer=DefaultSerializer(),
             acks="all",  # Wait for all replicas
             retries=3,
             max_in_flight_requests_per_connection=1,

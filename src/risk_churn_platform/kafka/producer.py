@@ -1,10 +1,9 @@
 """Kafka producer for async request mirroring."""
 
-import json
 from typing import Any
 
 import structlog
-from kafka import KafkaProducer
+from kafka import DefaultSerializer, JsonSerializer, KafkaProducer
 from kafka.errors import KafkaError
 
 logger = structlog.get_logger()
@@ -35,8 +34,8 @@ class PredictionProducer:
         try:
             self.producer = KafkaProducer(
                 bootstrap_servers=bootstrap_servers,
-                value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-                key_serializer=lambda k: k.encode("utf-8") if k else None,
+                value_serializer=JsonSerializer(),
+                key_serializer=DefaultSerializer(),
                 acks="all",  # Wait for all replicas
                 retries=3,
                 max_in_flight_requests_per_connection=1,  # Ensure ordering

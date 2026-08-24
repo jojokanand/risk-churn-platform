@@ -1,11 +1,10 @@
 """Kafka consumer for feedback and retraining pipeline."""
 
-import json
 from collections.abc import Callable
 from typing import Any
 
 import structlog
-from kafka import KafkaConsumer
+from kafka import DefaultSerializer, JsonSerializer, KafkaConsumer
 from kafka.errors import KafkaError
 
 logger = structlog.get_logger()
@@ -20,6 +19,7 @@ class FeedbackConsumer:
         topic: str = "ml.feedback",
         group_id: str = "risk-churn-platform",
         auto_offset_reset: str = "earliest",
+        consumer_timeout_ms: float = float("inf"),
     ) -> None:
         """Initialize Kafka consumer.
 
@@ -28,6 +28,7 @@ class FeedbackConsumer:
             topic: Kafka topic to consume from
             group_id: Consumer group ID
             auto_offset_reset: Where to start reading messages
+            consumer_timeout_ms: Stop iteration after this many idle milliseconds
         """
         self.topic = topic
 
@@ -37,9 +38,10 @@ class FeedbackConsumer:
                 bootstrap_servers=bootstrap_servers,
                 group_id=group_id,
                 auto_offset_reset=auto_offset_reset,
-                value_deserializer=lambda v: json.loads(v.decode("utf-8")),
-                key_deserializer=lambda k: k.decode("utf-8") if k else None,
+                value_deserializer=JsonSerializer(),
+                key_deserializer=DefaultSerializer(),
                 enable_auto_commit=False,  # Manual commit for reliability
+                consumer_timeout_ms=consumer_timeout_ms,
             )
             logger.info(
                 "kafka_consumer_initialized",
@@ -73,10 +75,6 @@ class FeedbackConsumer:
                     # Commit offset
                     self.consumer.commit()
 
-                    message_count += 1
-                    if max_messages and message_count >= max_messages:
-                        break
-
                 except Exception as e:
                     logger.error(
                         "message_processing_failed",
@@ -84,6 +82,9 @@ class FeedbackConsumer:
                         offset=message.offset,
                         partition=message.partition,
                     )
+                message_count += 1
+                if max_messages and message_count >= max_messages:
+                    break
 
         except KeyboardInterrupt:
             logger.info("consumer_interrupted")
@@ -107,6 +108,7 @@ class PredictionConsumer:
         topic: str = "ml.predictions",
         group_id: str = "risk-churn-platform-eval",
         auto_offset_reset: str = "earliest",
+        consumer_timeout_ms: float = float("inf"),
     ) -> None:
         """Initialize prediction consumer.
 
@@ -115,6 +117,7 @@ class PredictionConsumer:
             topic: Kafka topic to consume from
             group_id: Consumer group ID
             auto_offset_reset: Where to start reading messages
+            consumer_timeout_ms: Stop iteration after this many idle milliseconds
         """
         self.topic = topic
         self.predictions_buffer: list[dict[str, Any]] = []
@@ -126,8 +129,9 @@ class PredictionConsumer:
                 bootstrap_servers=bootstrap_servers,
                 group_id=group_id,
                 auto_offset_reset=auto_offset_reset,
-                value_deserializer=lambda v: json.loads(v.decode("utf-8")),
+                value_deserializer=JsonSerializer(),
                 enable_auto_commit=True,
+                consumer_timeout_ms=consumer_timeout_ms,
             )
             logger.info(
                 "prediction_consumer_initialized",

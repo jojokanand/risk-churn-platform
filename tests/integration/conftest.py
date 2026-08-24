@@ -5,12 +5,12 @@ import sys
 from unittest.mock import MagicMock, Mock
 
 
-def is_kafka_mocked():
-    """Check if Kafka should be mocked."""
-    return os.getenv("CI") == "true" or os.getenv("MOCK_KAFKA") == "true"
+def is_kafka_mocked() -> bool:
+    """Return whether explicit Kafka mocking is enabled."""
+    return os.getenv("MOCK_KAFKA") == "true"
 
 
-# Apply mocking at import time if needed
+# Apply mocking only when explicitly requested
 if is_kafka_mocked():
     # Create mock producer
     mock_producer = MagicMock()

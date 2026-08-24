@@ -1,18 +1,18 @@
 """Integration tests for Kafka components.
 
 These tests require a running Kafka instance.
-Run with: docker-compose up -d kafka
+Run with: docker compose up -d kafka
 
-In CI environment, Kafka is automatically mocked via conftest.py
+CI runs against a real Kafka service. Set MOCK_KAFKA=true to use explicit mocks.
 """
 
-import json
 import os
 import time
 from typing import Any
+from uuid import uuid4
 
 import pytest
-from kafka import KafkaConsumer, KafkaProducer
+from kafka import JsonSerializer, KafkaConsumer, KafkaProducer
 from kafka.admin import KafkaAdminClient, NewTopic
 
 from risk_churn_platform.kafka.consumer import FeedbackConsumer, PredictionConsumer
@@ -20,8 +20,13 @@ from risk_churn_platform.kafka.producer import PredictionProducer
 
 
 def is_kafka_mocked() -> bool:
-    """Check if Kafka is mocked (running in CI or with MOCK_KAFKA env var)."""
-    return os.getenv("CI") == "true" or os.getenv("MOCK_KAFKA") == "true"
+    """Return whether explicit Kafka mocking is enabled."""
+    return os.getenv("MOCK_KAFKA") == "true"
+
+
+def unique_group_id(prefix: str) -> str:
+    """Create an isolated consumer group for one test."""
+    return f"{prefix}-{uuid4().hex}"
 
 
 @pytest.fixture(scope="module")
@@ -31,7 +36,8 @@ def kafka_bootstrap_servers() -> list[str]:
     Returns:
         List of bootstrap servers
     """
-    return ["localhost:9092"]
+    configured_servers = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+    return [server.strip() for server in configured_servers.split(",") if server.strip()]
 
 
 @pytest.fixture(scope="module")
@@ -61,11 +67,14 @@ def test_topics(kafka_admin: KafkaAdminClient) -> dict[str, str]:
     Returns:
         Dict of topic names
     """
+
+    run_id = uuid4().hex
     topics = {
-        "predictions": "test.predictions",
-        "feedback": "test.feedback",
-        "drift": "test.drift",
-        "outliers": "test.outliers",
+        "predictions": f"test.{run_id}.predictions",
+        "feedback": f"test.{run_id}.feedback",
+        "drift": f"test.{run_id}.drift",
+        "outliers": f"test.{run_id}.outliers",
+        "errors": f"test.{run_id}.errors",
     }
 
     # If Kafka is mocked, skip topic creation
@@ -133,7 +142,7 @@ def test_producer_send_prediction(
         bootstrap_servers=kafka_bootstrap_servers,
         auto_offset_reset="earliest",
         consumer_timeout_ms=5000,
-        value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+        value_deserializer=JsonSerializer(),
     )
 
     # Read message
@@ -181,7 +190,7 @@ def test_producer_send_drift_alert(
         bootstrap_servers=kafka_bootstrap_servers,
         auto_offset_reset="earliest",
         consumer_timeout_ms=5000,
-        value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+        value_deserializer=JsonSerializer(),
     )
 
     messages = list(consumer)
@@ -209,7 +218,8 @@ def test_feedback_consumer(kafka_bootstrap_servers: list[str], test_topics: dict
         consumer = FeedbackConsumer(
             bootstrap_servers=kafka_bootstrap_servers,
             topic=test_topics["feedback"],
-            group_id="test-feedback-group",
+            group_id=unique_group_id("test-feedback"),
+            consumer_timeout_ms=5000,
         )
         consumer.close()
         return
@@ -217,7 +227,7 @@ def test_feedback_consumer(kafka_bootstrap_servers: list[str], test_topics: dict
     # Produce test messages
     producer = KafkaProducer(
         bootstrap_servers=kafka_bootstrap_servers,
-        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+        value_serializer=JsonSerializer(),
     )
 
     feedback_data = [
@@ -238,7 +248,8 @@ def test_feedback_consumer(kafka_bootstrap_servers: list[str], test_topics: dict
     consumer = FeedbackConsumer(
         bootstrap_servers=kafka_bootstrap_servers,
         topic=test_topics["feedback"],
-        group_id="test-feedback-group",
+        group_id=unique_group_id("test-feedback"),
+        consumer_timeout_ms=5000,
     )
 
     collected_feedback: list[dict[str, Any]] = []
@@ -270,7 +281,8 @@ def test_prediction_consumer_collect(
         consumer = PredictionConsumer(
             bootstrap_servers=kafka_bootstrap_servers,
             topic=test_topics["predictions"],
-            group_id="test-prediction-group",
+            group_id=unique_group_id("test-prediction"),
+            consumer_timeout_ms=5000,
         )
         consumer.close()
         return
@@ -278,7 +290,7 @@ def test_prediction_consumer_collect(
     # Produce test predictions
     producer = KafkaProducer(
         bootstrap_servers=kafka_bootstrap_servers,
-        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+        value_serializer=JsonSerializer(),
     )
 
     predictions = [
@@ -298,7 +310,8 @@ def test_prediction_consumer_collect(
     consumer = PredictionConsumer(
         bootstrap_servers=kafka_bootstrap_servers,
         topic=test_topics["predictions"],
-        group_id="test-prediction-group",
+        group_id=unique_group_id("test-prediction"),
+        consumer_timeout_ms=5000,
     )
 
     collected = consumer.collect_predictions(max_messages=5)
@@ -326,10 +339,10 @@ def test_consumer_error_handling(
     # Produce message that will cause processing error
     producer = KafkaProducer(
         bootstrap_servers=kafka_bootstrap_servers,
-        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+        value_serializer=JsonSerializer(),
     )
 
-    producer.send(test_topics["feedback"], value={"malformed": "data"})
+    producer.send(test_topics["errors"], value={"malformed": "data"})
     producer.flush()
     producer.close()
 
@@ -337,8 +350,9 @@ def test_consumer_error_handling(
 
     consumer = FeedbackConsumer(
         bootstrap_servers=kafka_bootstrap_servers,
-        topic=test_topics["feedback"],
-        group_id="test-error-group",
+        topic=test_topics["errors"],
+        group_id=unique_group_id("test-error"),
+        consumer_timeout_ms=5000,
     )
 
     error_count = 0
@@ -393,7 +407,8 @@ def test_end_to_end_prediction_flow(
     consumer = PredictionConsumer(
         bootstrap_servers=kafka_bootstrap_servers,
         topic=test_topics["predictions"],
-        group_id="test-e2e-group",
+        group_id=unique_group_id("test-e2e"),
+        consumer_timeout_ms=5000,
     )
 
     predictions = consumer.collect_predictions(max_messages=10)
