@@ -32,9 +32,8 @@ The Risk/Churn Scoring Platform is a production-ready ML platform featuring:
 
 ## Getting Help
 
-- 📖 **Documentation**: Browse the guides above
-- 🐛 **Issues**: [GitHub Issues](https://github.com/jyothsnakanand/risk-churn-platform/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/jyothsnakanand/risk-churn-platform/discussions)
+- **Documentation**: Browse the guides above
+- **Issues**: [GitHub Issues](https://github.com/jojokanand/risk-churn-platform/issues)
 
 ---
 
