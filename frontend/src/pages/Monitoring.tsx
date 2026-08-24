@@ -174,10 +174,15 @@ const Monitoring: React.FC = () => {
 
   return (
     <div className="monitoring-page">
+      <div className="simulation-notice">
+        <strong>Simulated monitoring data.</strong> This view demonstrates drift
+        detection, model performance, and outlier-monitoring workflows using a
+        seeded dataset.
+      </div>
       {/* Health Overview */}
       <div className="health-overview">
         <div className="health-card">
-          <div className="health-icon healthy">[OK]</div>
+          <div className="health-icon healthy" aria-hidden="true">✓</div>
           <div className="health-info">
             <div className="health-label">Model Health</div>
             <div className="health-status">Healthy</div>
@@ -185,7 +190,7 @@ const Monitoring: React.FC = () => {
         </div>
 
         <div className="health-card">
-          <div className="health-icon warning">[WARN]</div>
+          <div className="health-icon warning" aria-hidden="true">!</div>
           <div className="health-info">
             <div className="health-label">Active Drift Alerts</div>
             <div className="health-status">2</div>
@@ -193,7 +198,7 @@ const Monitoring: React.FC = () => {
         </div>
 
         <div className="health-card">
-          <div className="health-icon info">[DATA]</div>
+          <div className="health-icon info" aria-hidden="true">↗</div>
           <div className="health-info">
             <div className="health-label">Avg Latency</div>
             <div className="health-status">12.4ms</div>
@@ -201,7 +206,7 @@ const Monitoring: React.FC = () => {
         </div>
 
         <div className="health-card">
-          <div className="health-icon healthy">[TARGET]</div>
+          <div className="health-icon healthy" aria-hidden="true">◎</div>
           <div className="health-info">
             <div className="health-label">Prediction Accuracy</div>
             <div className="health-status">91.2%</div>
