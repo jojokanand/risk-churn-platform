@@ -14,15 +14,16 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files and source code
-COPY pyproject.toml README.md ./
+COPY pyproject.toml uv.lock README.md ./
 COPY src/ ./src/
 COPY config/ ./config/
 
 # Install uv for faster dependency installation
-RUN pip install uv
+RUN pip install --no-cache-dir uv
 
 # Install dependencies
-RUN uv pip install --system -e .
+RUN uv sync --locked --no-dev
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Create models directory
 RUN mkdir -p models/v1 models/v2
