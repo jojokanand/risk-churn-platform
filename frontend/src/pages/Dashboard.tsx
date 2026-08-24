@@ -39,7 +39,7 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Mock real-time data for charts
+  // Simulated chart data for the local demonstration
   const [predictionData, setPredictionData] = useState({
     labels: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30'],
     datasets: [
@@ -230,14 +230,14 @@ const Dashboard: React.FC = () => {
       <div className="charts-section">
         <div className="charts-grid">
           <div className="card chart-card">
-            <div className="card-title">Prediction Volume</div>
+            <div className="card-title">Simulated Prediction Volume</div>
             <div className="chart-container">
               <Line data={predictionData} options={chartOptions} />
             </div>
           </div>
 
           <div className="card chart-card">
-            <div className="card-title">Model Performance</div>
+            <div className="card-title">Simulated Model Performance</div>
             <div className="chart-container">
               <Line data={accuracyData} options={chartOptions} />
             </div>
@@ -246,7 +246,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Model Comparison */}
-      {shadowAnalysis && shadowAnalysis.total_comparisons !== undefined && (
+      {shadowAnalysis && shadowAnalysis.total_comparisons > 0 && shadowAnalysis.total_comparisons !== undefined && (
         <div className="comparison-section">
           <h3 className="section-title">Shadow Deployment Analysis</h3>
           <div className="card">
@@ -273,7 +273,7 @@ const Dashboard: React.FC = () => {
                 <div className="comparison-label">V2 Performance</div>
                 <div className="comparison-value">
                   {shadowAnalysis.v2_better > shadowAnalysis.v1_better ? (
-                    <span className="positive">Better [OK]</span>
+                    <span className="positive">Better</span>
                   ) : (
                     <span className="neutral">Similar</span>
                   )}
@@ -284,27 +284,27 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Recent Activity */}
+      {/* Simulated Activity Feed */}
       <div className="activity-section">
-        <h3 className="section-title">Recent Activity</h3>
+        <h3 className="section-title">Simulated Activity Feed</h3>
         <div className="card">
           <div className="activity-list">
             <div className="activity-item">
-              <div className="activity-icon">[TARGET]</div>
+              <div className="activity-icon" aria-hidden="true">!</div>
               <div className="activity-content">
                 <div className="activity-title">High-risk prediction detected</div>
                 <div className="activity-time">2 minutes ago</div>
               </div>
             </div>
             <div className="activity-item">
-              <div className="activity-icon">✅</div>
+              <div className="activity-icon" aria-hidden="true">✓</div>
               <div className="activity-content">
                 <div className="activity-title">Model v2 performing well</div>
                 <div className="activity-time">15 minutes ago</div>
               </div>
             </div>
             <div className="activity-item">
-              <div className="activity-icon">[DATA]</div>
+              <div className="activity-icon" aria-hidden="true">≡</div>
               <div className="activity-content">
                 <div className="activity-title">Daily metrics report generated</div>
                 <div className="activity-time">1 hour ago</div>
