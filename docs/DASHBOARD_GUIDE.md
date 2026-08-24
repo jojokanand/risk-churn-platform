@@ -27,7 +27,7 @@ Complete guide to using the Risk Churn Platform web dashboard.
 
 2. **Docker:**
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
    Open [http://localhost](http://localhost)
 
