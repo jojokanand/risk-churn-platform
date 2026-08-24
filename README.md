@@ -1,12 +1,9 @@
 # Risk/Churn Scoring Platform
 
-[![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Tests](https://img.shields.io/badge/tests-113%20passed-success.svg)](tests/)
-[![Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen.svg)](tests/)
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
-[![Kubernetes](https://img.shields.io/badge/kubernetes-ready-326CE5.svg)](k8s/)
+[![CI/CD Pipeline](https://github.com/jojokanand/risk-churn-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/jojokanand/risk-churn-platform/actions/workflows/ci.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Code style: Black](https://img.shields.io/badge/code%20style-Black-000000.svg)](https://github.com/psf/black)
 
 A production-ready ML platform for risk and churn prediction with A/B testing, drift detection, and automated retraining, built on Seldon Core.
 
