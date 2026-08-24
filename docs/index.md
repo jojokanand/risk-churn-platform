@@ -5,7 +5,7 @@ title: Documentation
 
 # Risk/Churn Scoring Platform Documentation
 
-Welcome to the comprehensive documentation for the Risk/Churn Scoring Platform - a production-ready ML platform for customer risk and churn prediction.
+Welcome to the documentation for the Risk/Churn Scoring Platform, a production-style MLOps reference implementation for customer risk and churn prediction.
 
 ## Quick Navigation
 
@@ -62,7 +62,7 @@ Welcome to the comprehensive documentation for the Risk/Churn Scoring Platform -
 
 <div class="doc-card">
   <h3><a href="DEPLOYMENT">Deployment Guide</a></h3>
-  <p>Deploy to production with Docker or Kubernetes.</p>
+  <p>Explore local and Kubernetes deployment patterns using Docker, Kubernetes, and Seldon Core.</p>
   <ul>
     <li>Docker Compose deployment</li>
     <li>Kubernetes with Seldon Core</li>
@@ -86,7 +86,7 @@ Welcome to the comprehensive documentation for the Risk/Churn Scoring Platform -
 
 ## Platform Overview
 
-The Risk/Churn Scoring Platform is a complete solution for:
+The Risk/Churn Scoring Platform demonstrates:
 
 - **Churn Prediction**: Predict customer churn risk with ML models
 - **A/B Testing**: Shadow deployment, canary releases, blue-green deployment
@@ -115,12 +115,11 @@ The Risk/Churn Scoring Platform is a complete solution for:
 - Kafka streaming integration
 - Feature transformation pipeline
 
-### Production-Ready
-- Docker Compose for development
-- Kubernetes deployment ready
-- Prometheus metrics
-- Grafana dashboards
-- Comprehensive testing (113 tests)
+### Operational Tooling
+- Docker Compose for local development
+- Kubernetes and Seldon Core reference manifests
+- Prometheus metrics and Grafana dashboard configuration
+- Automated unit, integration, lint, and security checks
 
 ## Technology Stack
 
