@@ -161,7 +161,7 @@ const Predictions: React.FC = () => {
           <h3 className="card-title">Customer Information</h3>
           <form onSubmit={handleSubmit} className="prediction-form">
             <div className="form-section">
-              <h4 className="form-section-title">[DATA] Customer Demographics & Tenure</h4>
+              <h4 className="form-section-title">Customer Demographics & Tenure</h4>
               <div className="form-row">
                 <div className="form-group">
                   <label>Customer Age (days)</label>
@@ -187,7 +187,7 @@ const Predictions: React.FC = () => {
             </div>
 
             <div className="form-section">
-              <h4 className="form-section-title">[PURCHASE] Purchase Behavior</h4>
+              <h4 className="form-section-title">Purchase Behavior</h4>
               <div className="form-row">
                 <div className="form-group">
                   <label>Total Orders</label>
@@ -250,7 +250,7 @@ const Predictions: React.FC = () => {
             </div>
 
             <div className="form-section">
-              <h4 className="form-section-title">[GROWTH] Engagement Metrics</h4>
+              <h4 className="form-section-title">Engagement Metrics</h4>
               <div className="form-row">
                 <div className="form-group">
                   <label>Website Visits (30d)</label>
@@ -304,7 +304,7 @@ const Predictions: React.FC = () => {
             </div>
 
             <div className="form-section">
-              <h4 className="form-section-title">[SERVICE] Customer Service</h4>
+              <h4 className="form-section-title">Customer Service</h4>
               <div className="form-row">
                 <div className="form-group">
                   <label>Total Support Tickets</label>
@@ -352,7 +352,7 @@ const Predictions: React.FC = () => {
             </div>
 
             <div className="form-section">
-              <h4 className="form-section-title">[CATEGORY] Product & Payment Preferences</h4>
+              <h4 className="form-section-title">Product & Payment Preferences</h4>
               <div className="form-row">
                 <div className="form-group">
                   <label>Favorite Category</label>
@@ -569,7 +569,7 @@ const Predictions: React.FC = () => {
           {!prediction && !error && (
             <div className="card placeholder-card">
               <div className="placeholder-content">
-                <div className="placeholder-icon">[TARGET]</div>
+                <div className="placeholder-icon" aria-hidden="true">◎</div>
                 <h3>Make a Prediction</h3>
                 <p>Fill in the customer information and click "Get Prediction" to see the churn risk analysis.</p>
               </div>
