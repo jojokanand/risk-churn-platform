@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Code style: Black](https://img.shields.io/badge/code%20style-Black-000000.svg)](https://github.com/psf/black)
 
+[**Read the Documentation →**](https://jojokanand.github.io/risk-churn-platform/)
+
 A production-style MLOps platform for risk and churn prediction, demonstrating model routing, drift detection, monitoring, and automated retraining with Seldon Core.
 
 ## Features
