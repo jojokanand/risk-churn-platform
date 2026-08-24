@@ -700,8 +700,6 @@ List of highest-risk customers with:
 ### Support
 
 - GitHub Issues: Report bugs
-- Team Chat: Real-time help
-- Email: team@example.com
 
 ### Learning Resources
 
