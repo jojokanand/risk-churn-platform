@@ -141,14 +141,14 @@ const Dashboard: React.FC = () => {
         <h3 className="section-title">System Status</h3>
         <div className="status-grid">
           <div className="status-card">
-            <div className="status-icon healthy">[OK]</div>
+            <div className="status-icon healthy" aria-hidden="true">✓</div>
             <div className="status-content">
               <div className="status-label">Platform Status</div>
               <div className="status-value">{health?.status || 'Unknown'}</div>
             </div>
           </div>
           <div className="status-card">
-            <div className="status-icon healthy">[ACTIVE]</div>
+            <div className="status-icon healthy" aria-hidden="true">✓</div>
             <div className="status-content">
               <div className="status-label">Model v1</div>
               <div className="status-value">
@@ -157,7 +157,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           <div className="status-card">
-            <div className="status-icon healthy">[ACTIVE]</div>
+            <div className="status-icon healthy" aria-hidden="true">✓</div>
             <div className="status-content">
               <div className="status-label">Model v2</div>
               <div className="status-value">
@@ -166,7 +166,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           <div className="status-card">
-            <div className="status-icon info">[DATA]</div>
+            <div className="status-icon info" aria-hidden="true">⇄</div>
             <div className="status-content">
               <div className="status-label">Routing Strategy</div>
               <div className="status-value">{metrics?.strategy || 'N/A'}</div>
