@@ -9,6 +9,33 @@
 
 A production-style MLOps platform for risk and churn prediction, demonstrating model routing, drift detection, monitoring, and automated retraining with Seldon Core.
 
+## Platform Preview
+
+### Live routing dashboard
+
+[![Churn platform dashboard](docs/screenshots/dashboard-overview.png)](docs/screenshots/dashboard-overview.png)
+
+<table>
+  <tr>
+    <td width="50%">
+      <a href="docs/screenshots/prediction-result.png">
+        <img src="docs/screenshots/prediction-result.png" alt="End-to-end churn prediction result">
+      </a>
+      <br>
+      <strong>Prediction workflow</strong><br>
+      Interactive risk scoring with probability, routing strategy, latency, and recommended actions.
+    </td>
+    <td width="50%">
+      <a href="docs/screenshots/drift-monitoring.png">
+        <img src="docs/screenshots/drift-monitoring.png" alt="Model drift monitoring dashboard">
+      </a>
+      <br>
+      <strong>Drift monitoring</strong><br>
+      Seeded demonstration of feature drift, alert severity, and monitoring workflows.
+    </td>
+  </tr>
+</table>
+
 ## Features
 
 ### Interactive Web Dashboard
